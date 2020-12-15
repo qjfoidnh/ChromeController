@@ -1,12 +1,12 @@
 
 import logging
-import contextlib
+# import contextlib
 import traceback
 
 from .manager import ChromeRemoteDebugInterface
 
-@contextlib.contextmanager
-def ChromeContext(*args, **kwargs):
+# @contextlib.contextmanager
+class ChromeContext():
 	'''
 	Context manager for conveniently handling the lifetime of the underlying chromium instance.
 
@@ -14,22 +14,30 @@ def ChromeContext(*args, **kwargs):
 
 	All parameters are forwarded through to the underlying ChromeRemoteDebugInterface() constructor.
 	'''
-	log = logging.getLogger("Main.ChromeController.ChromeContext")
-	chrome_created = False
-	try:
-		chrome_instance = ChromeRemoteDebugInterface(*args, **kwargs)
-		chrome_created = True
-		log.info("Entering chrome context")
-		yield chrome_instance
-	except Exception as e:
+	def __init__(self, *args, **kwargs):
+		log = logging.getLogger("Main.ChromeController.ChromeContext")
+		self.chrome_created = False
+		try:
+			chrome_instance = ChromeRemoteDebugInterface(*args, **kwargs)
+			self.chrome_created = True
+			log.info("Entering chrome context")
+			self.instance = chrome_instance
+		except Exception as e:
+			log.error("Exception in chrome context!")
+			for line in traceback.format_exc().split("\n"):
+				log.error(line)
+			raise e
 
-		log.error("Exception in chrome context!")
-		for line in traceback.format_exc().split("\n"):
-			log.error(line)
-		raise e
-
-	finally:
-		log.info("Exiting chrome context")
-		if chrome_created:
-			chrome_instance.close()
+# 		finally:
+# 			log.info("Exiting chrome context")
+# 			if chrome_created:
+# 				chrome_instance.close()
+	def get_instance(self):
+		if self.chrome_created:
+			return self.instance
+		else:
+			return None
+	def close(self):
+		if self.chrome_created:
+			self.instance.close()
 
