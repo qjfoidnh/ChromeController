@@ -37,11 +37,11 @@ class ChromeExecutionManager():
 	def __init__(self,
 			binary,
 			base_tab_key,
-			host               = 'localhost',
+			host               = '0.0.0.0',
 			port               = None,
 			websocket_timeout  = 10,
 			enable_gpu         = False,
-			headless           = True,
+			headless           = False,
 			additional_options = [],
 			):
 		"""
